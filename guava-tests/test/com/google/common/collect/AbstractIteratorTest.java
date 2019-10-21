@@ -41,7 +41,7 @@ public class AbstractIteratorTest extends TestCase {
         new AbstractIterator<Integer>() {
           private int rep;
 
-          @Override
+          @Override //Implementation of the method computeNext(), which iterates through the elements and returns the next element
           public Integer computeNext() {
             switch (rep++) {
               case 0:
@@ -49,31 +49,31 @@ public class AbstractIteratorTest extends TestCase {
               case 1:
                 return 1;
               case 2:
-                return endOfData();
+                return endOfData(); //there are no more elements to iterate through
               default:
-                fail("Should not have been invoked again");
+                fail("Should not have been invoked again"); //the test fails and this message is shown because after endOfData() is called, computeNext() is not called again
                 return null;
             }
           }
         };
 
-    assertTrue(iter.hasNext());
-    assertEquals(0, (int) iter.next());
+    assertTrue(iter.hasNext()); //POSITIVE TEST CASE: asserts that the method hasNext() will return true because the iteration has more elements
+    assertEquals(0, (int) iter.next()); //asserts that the next element in the iteration, returned by the method next(), is equal to 0 (first call to computeNext())
 
-    // verify idempotence of hasNext()
+    // verify idempotence of hasNext() - the method is called multiple times before next() and it returns the same result (true)
+    assertTrue(iter.hasNext()); 
     assertTrue(iter.hasNext());
     assertTrue(iter.hasNext());
-    assertTrue(iter.hasNext());
-    assertEquals(1, (int) iter.next());
+    assertEquals(1, (int) iter.next()); //asserts that the next element in the iteration, returned by the method next(), is equal to 1 (second call to computeNext())
 
-    assertFalse(iter.hasNext());
+    assertFalse(iter.hasNext()); //asserts that the method hasNext() will not return true, because the iteration has reached endOfData()
 
     // Make sure computeNext() doesn't get invoked again
     assertFalse(iter.hasNext());
 
     try {
-      iter.next();
-      fail("no exception thrown");
+      iter.next(); //this call to next() should throw an exception because the iterator has reached endOfData()
+      fail("no exception thrown"); //NEGATIVE TEST CASE: the method fail() will exhibit a message that no Exception was thrown when it should have been
     } catch (NoSuchElementException expected) {
     }
   }
